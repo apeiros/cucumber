@@ -1,6 +1,20 @@
 require 'cucumber/step_match'
 require 'cucumber/core_ext/string'
 require 'cucumber/core_ext/proc'
+begin
+	require 'silverplatter/wordex'
+rescue LoadError
+	warn "Starting without wordex." if $VERBOSE
+	module SilverPlatter
+		# Fake WordEx, simply emulates Cucumbers old behaviour
+		class WordEx
+			def self.new(pattern)
+        # Replace $var with (.*?)
+        Regexp.new("^#{pattern.gsub(/\$\w+/, '(.*?)')}$") 
+      end
+		end
+	end
+end
 
 module Cucumber
   module StepDefinitionMethods
@@ -87,11 +101,8 @@ module Cucumber
     include StepDefinitionMethods
 
     def initialize(pattern, &proc)
-      raise MissingProc if proc.nil?
-      if String === pattern
-        p = pattern.gsub(/\$\w+/, '(.*)') # Replace $var with (.*)
-        pattern = Regexp.new("^#{p}$") 
-      end
+      raise MissingProc unless proc
+      pattern = SilverPlatter::WordEx.new(pattern) if String === pattern
       @regexp, @proc = pattern, proc
     end
 
