@@ -3,6 +3,7 @@ require 'cucumber/core_ext/string'
 require 'cucumber/core_ext/proc'
 begin
 	require 'silverplatter/wordex'
+	#raise LoadError
 rescue LoadError
 	warn "Starting without wordex." if $VERBOSE
 	module SilverPlatter
@@ -19,7 +20,7 @@ end
 module Cucumber
   module StepDefinitionMethods
     def step_match(name_to_match, name_to_report)
-      if(match = name_to_match.match(regexp))
+      if(match = regexp.match(name_to_match))
         StepMatch.new(self, name_to_match, name_to_report, match.captures)
       else
         nil

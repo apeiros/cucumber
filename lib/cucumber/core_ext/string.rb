@@ -17,7 +17,7 @@ class String
 
   # TODO: Use subs instead...
   def gzub(regexp, format=nil, &proc)
-    md = match(regexp)
+    md = regexp.match(self)
     raise "#{self.inspect} doesn't match #{regexp.inspect}" if md.nil?
     
     s = dup
